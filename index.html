@@ -91,9 +91,14 @@ p { margin: 0; }
   backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
 }
 .top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-block: 18px; }
-.logo { display: flex; flex-direction: column; text-decoration: none; line-height: 1; }
-.logo b { font-family: var(--font-logo); font-weight: 800; font-size: 25px; letter-spacing: -.02em; }
-.logo span { font-family: var(--font-logo); font-weight: 300; font-size: 9.5px; letter-spacing: .46em; margin-top: 3px; }
+.logo { display: flex; align-items: center; gap: 12px; text-decoration: none; line-height: 1; }
+.logo .mark { width: 29px; height: 30px; flex: none; }
+.logo .word { display: flex; flex-direction: column; padding-left: 12px; border-left: 1px solid var(--line); }
+.logo b { font-family: var(--font-logo); font-weight: 800; font-size: 24px; letter-spacing: -.02em; }
+.logo .word span { font-family: var(--font-logo); font-weight: 300; font-size: 9.5px; letter-spacing: .46em; margin-top: 3px; }
+.foot-brand { display: inline-flex; align-items: center; gap: 12px; }
+.foot-brand .mark { width: 22px; height: 23px; color: var(--deep-fg); }
+.contact .big-mark { float: right; width: clamp(64px, 9vw, 120px); height: auto; color: var(--accent); margin: 8px 0 0 24px; }
 .nav { display: flex; align-items: center; gap: 30px; font-size: 14px; }
 .nav a { text-decoration: none; color: var(--muted); transition: color .2s; }
 .nav a:hover { color: var(--fg); }
@@ -281,7 +286,7 @@ dialog.lb::backdrop { background: rgba(12,10,9,.82); backdrop-filter: blur(4px);
 
 <header class="top">
   <div class="wrap">
-    <a class="logo" href="#inicio" aria-label="Nosso Arquitetura, início"><b>nosso</b><span>ARQUITETURA</span></a>
+    <a class="logo" href="#inicio" aria-label="Nosso Arquitetura, início"><svg class="mark" viewBox="0 0 41 43" aria-hidden="true"><path d="M0 0L41 6.2V43H30.6V14.6L11 11.7V43H0Z" fill="currentColor"/></svg><span class="word"><b>nosso</b><span>ARQUITETURA</span></span></a>
     <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="nav">Menu</button>
     <nav class="nav" id="nav" aria-label="Seções">
       <a href="#projetos">Projetos</a>
@@ -412,6 +417,7 @@ dialog.lb::backdrop { background: rgba(12,10,9,.82); backdrop-filter: blur(4px);
 
   <section class="deep contact on-deep" id="contato">
     <div class="wrap">
+      <svg class="big-mark" viewBox="0 0 41 43" aria-hidden="true"><path d="M0 0L41 6.2V43H30.6V14.6L11 11.7V43H0Z" fill="currentColor"/></svg>
       <div class="label">Contato</div>
       <h2 class="display">Vamos realizar <em>seus sonhos?</em></h2>
       <div class="contact-row">
@@ -421,7 +427,7 @@ dialog.lb::backdrop { background: rgba(12,10,9,.82); backdrop-filter: blur(4px);
         <span class="handle">@nossoarquitetura</span>
       </div>
       <div class="foot">
-        <span>Nosso • arquitetura · Arquitetura e Urbanismo</span>
+        <span class="foot-brand"><svg class="mark" viewBox="0 0 41 43" aria-hidden="true"><path d="M0 0L41 6.2V43H30.6V14.6L11 11.7V43H0Z" fill="currentColor"/></svg>Nosso • arquitetura · Arquitetura e Urbanismo</span>
         <span>Bahia · Pará · São Paulo · Sergipe</span>
       </div>
     </div>

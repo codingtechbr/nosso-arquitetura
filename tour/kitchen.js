@@ -18,7 +18,9 @@ if (!document.getElementById("k-style")) {
 .k-root canvas:active { cursor: grabbing; }
 .k-glass { background: rgba(22,18,16,.74); border: 1px solid rgba(255,255,255,.12); backdrop-filter: blur(16px) saturate(1.2); -webkit-backdrop-filter: blur(16px) saturate(1.2); border-radius: 14px; }
 .k-top { position: absolute; z-index: 5; top: calc(env(safe-area-inset-top, 0px) + 12px); left: max(12px, env(safe-area-inset-left, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; pointer-events: none; }
-.k-brand { pointer-events: auto; padding: 10px 14px; min-width: 0; }
+.k-brand { pointer-events: auto; padding: 10px 14px; min-width: 0; display: flex; align-items: center; gap: 11px; }
+.k-mark { width: 21px; height: 22px; flex: none; color: #F3EEE8; }
+.k-bt { min-width: 0; padding-left: 11px; border-left: 1px solid rgba(255,255,255,.16); }
 .k-brand h2 { margin: 0; font-family: "Archivo", "Helvetica Neue", sans-serif; font-stretch: 112%; font-weight: 500; font-size: 16px; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .k-brand small { display: block; font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 10.5px; color: #B3A89D; margin-top: 2px; white-space: nowrap; }
 .k-actions { display: flex; gap: 8px; pointer-events: auto; flex-shrink: 0; }
@@ -75,7 +77,7 @@ host.innerHTML = `
 <div class="k-root${TOUCH || innerWidth < 760 ? " k-mobile" : ""}">
   <div class="k-loading" data-k="loading">Montando a cozinha…</div>
   <div class="k-top">
-    <div class="k-brand k-glass"><h2 data-k="name">Cozinha Total White</h2><small data-k="sub">Aracaju, SE · passeio em 3D</small></div>
+    <div class="k-brand k-glass"><svg class="k-mark" viewBox="0 0 41 43" aria-hidden="true"><path d="M0 0L41 6.2V43H30.6V14.6L11 11.7V43H0Z" fill="currentColor"/></svg><div class="k-bt"><h2 data-k="name">Cozinha Total White</h2><small data-k="sub">Aracaju, SE · passeio em 3D</small></div></div>
     <div class="k-actions">
       <button class="k-btn" data-k="night" type="button" aria-pressed="false" aria-label="Modo noite">${ICON_SUN}<span class="k-lbl">Noite</span></button>
       <label class="k-btn" title="Abrir um projeto em .glb">${ICON_OPEN}<span class="k-lbl">Abrir .glb</span><input type="file" data-k="file" accept=".glb" hidden></label>
