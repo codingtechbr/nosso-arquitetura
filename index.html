@@ -205,6 +205,11 @@ body.tour-open { overflow: hidden; }
 .card { all: unset; position: relative; cursor: pointer; overflow: hidden; border-radius: 3px; background: var(--line); min-width: 0; }
 .card.big { grid-column: span 2; grid-row: span 2; }
 .card.wide { grid-column: span 2; }
+.card.tall { grid-row: span 2; }
+.card.plan { background: #fff; }
+.card.plan img { object-fit: contain; padding: 18px 18px 64px; }
+.card.plan::after { inset: 55% 0 0; background: linear-gradient(transparent, rgba(16,13,11,.82)); }
+.lb-img.plan { background: #fff; }
 @media (max-width: 720px) { .card.big { grid-row: span 2; } }
 .card img { width: 100%; height: 100%; object-fit: cover; transition: transform .9s cubic-bezier(.2,.7,.2,1); }
 .card:hover img { transform: scale(1.05); }
@@ -455,18 +460,18 @@ dialog.lb::backdrop { background: rgba(12,10,9,.82); backdrop-filter: blur(4px);
 <script>
 const TOUR = "#cozinha-3d";
 const PROJECTS = [
-  { img: "casa-fg.jpg", size: "big", cat: "Residencial", title: "Casa alto padrão F&G", loc: "Canaã dos Carajás, PA",
+  { img: "casa-fg-planta.jpg", size: "big", plan: true, cat: "Residencial", title: "Casa alto padrão F&G", loc: "Planta baixa · Canaã dos Carajás, PA",
     cap: "4 suítes\nAmbientes sociais integrados\nÁrea de lazer frontal\nEntre outros aspectos que fizeram esse projeto atender todas as necessidades dos clientes.",
     url: "https://www.instagram.com/nossoarquitetura/p/C-K9XYwuZa5/" },
   { img: "cozinha-white.jpg", size: "wide", cat: "Interiores", title: "Cozinha Total White", loc: "Aracaju, SE · foto @filippearaujo.fotografia",
     cap: "Cozinha total white. Sofisticada e funcional!", url: "https://www.instagram.com/nossoarquitetura/p/CgcM0ZjMByv/", tour: TOUR },
-  { img: "ct-fachada.jpg", cat: "Comercial", title: "CT com identidade própria", loc: "Fachada comercial",
+  { img: "ct-fachada.jpg", size: "tall", cat: "Comercial", title: "CT com identidade própria", loc: "Fachada comercial",
     cap: "O cliente da NOSSO pediu um CT que fugisse do visual genérico de academia.\n\nA proposta foi criar uma identidade arquitetônica marcante, que pudesse ser reconhecida de longe e transmitisse a personalidade do espaço logo na fachada.\n\nElementos metálicos, iluminação linear e uma composição que valoriza a marca dão forma a um ambiente com identidade própria.",
     url: "https://www.instagram.com/nossoarquitetura/reel/DfpZYCsyeLd/" },
-  { img: "home-office.jpg", cat: "Interiores", title: "Home office", loc: "Interiores residenciais",
+  { img: "home-office.jpg", size: "tall", cat: "Interiores", title: "Home office", loc: "Interiores residenciais",
     cap: "Estante em madeira do piso ao teto, mesa de reunião e poltrona de leitura no mesmo ambiente.",
     url: "https://www.instagram.com/nossoarquitetura/p/DPO35ZfDf1i/" },
-  { img: "casa-maio25.jpg", cat: "Residencial", title: "Residência térrea", loc: "Planta e fachada",
+  { img: "casa-maio25-planta.jpg", size: "wide", plan: true, cat: "Residencial", title: "Residência térrea", loc: "Planta baixa",
     cap: "Casa térrea de linhas horizontais, com garagem central, painéis em madeira e ambientes distribuídos em duas alas.",
     url: "https://www.instagram.com/nossoarquitetura/p/DJcIURPNDpu/" },
   { img: "sala-medica.jpg", cat: "Comercial", title: "Sala Médica da MN", loc: "Consultório · @rafaarquiteto",
@@ -475,7 +480,7 @@ const PROJECTS = [
   { img: "nao-so-arquitetura.jpg", cat: "Interiores", title: "Área gourmet", loc: "Pergolado e mesa em madeira",
     cap: "Mesa redonda em madeira, pergolado com entrada de luz natural e cozinha de apoio integrada.",
     url: "https://www.instagram.com/nossoarquitetura/p/Dfm4mNzIOd3/" },
-  { img: "casa-minimalista.jpg", cat: "Residencial", title: "Casa moderna e minimalista", loc: "Planta baixa · dois pavimentos",
+  { img: "casa-minimalista.jpg", size: "wide", plan: true, cat: "Residencial", title: "Casa moderna e minimalista", loc: "Planta baixa · dois pavimentos",
     cap: "Design moderno e minimalista que redefine o conceito de morar bem. Cada detalhe desta residência foi pensado para proporcionar conforto e estilo, com linhas contemporâneas e uma integração perfeita entre os espaços internos e externos.",
     url: "https://www.instagram.com/nossoarquitetura/p/C-vof52SsSJ/" }
 ];
@@ -483,7 +488,7 @@ const PROJECTS = [
 const grid = document.getElementById("grid");
 PROJECTS.forEach((p, i) => {
   const b = document.createElement("button");
-  b.className = "card" + (p.size ? " " + p.size : ""); b.type = "button"; b.dataset.cat = p.cat;
+  b.className = "card" + (p.size ? " " + p.size : "") + (p.plan ? " plan" : ""); b.type = "button"; b.dataset.cat = p.cat;
   b.setAttribute("aria-label", p.title + ", " + p.cat);
   b.innerHTML = `${p.tour ? '<span class="badge3d">Passeio 3D</span>' : ""}<img src="img/${p.img}" alt="" loading="lazy">
     <div class="meta"><div class="cat">${p.cat}</div><h3>${p.title}</h3><div class="loc">${p.loc}</div></div>`;
@@ -499,7 +504,8 @@ document.querySelectorAll("[data-f]").forEach(btn => btn.addEventListener("click
 const lb = document.getElementById("lb");
 function openLb(i) {
   const p = PROJECTS[i];
-  const im = document.getElementById("lb-img"); im.src = "img/" + p.img; im.alt = p.title;
+  const im = document.getElementById("lb-img"); im.src = "img/" + p.img; im.alt = p.plan ? "Planta baixa: " + p.title : p.title;
+  im.parentElement.classList.toggle("plan", !!p.plan);
   document.getElementById("lb-title").textContent = p.title;
   document.getElementById("lb-meta").textContent = p.cat + " · " + p.loc;
   document.getElementById("lb-cap").textContent = p.cap;

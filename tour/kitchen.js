@@ -279,14 +279,27 @@ TX.round = tex(256, 256, (g, w) => {
   g.fillStyle = gr; g.fillRect(0, 0, w, w);
 });
 
+TX.paint = tex(512, 512, (g, w) => {
+  const r = rng(77); const img = g.createImageData(w, w);
+  for (let i = 0; i < img.data.length; i += 4) { const v = 236 + r() * 19; img.data[i] = img.data[i + 1] = img.data[i + 2] = v; img.data[i + 3] = 255; }
+  g.putImageData(img, 0, 0); g.filter = "blur(1px)"; g.drawImage(g.canvas, 0, 0); g.filter = "none";
+}, false);
+TX.polish = tex(1024, 1024, (g, w) => {
+  const r = rng(91); g.fillStyle = "rgb(150,150,150)"; g.fillRect(0, 0, w, w);
+  for (let i = 0; i < 70; i++) {
+    const x = r() * w, y = r() * w, rad = 40 + r() * 160, v = 120 + r() * 135;
+    const gr = g.createRadialGradient(x, y, 0, x, y, rad); gr.addColorStop(0, `rgba(${v},${v},${v},.5)`); gr.addColorStop(1, "rgba(150,150,150,0)");
+    g.fillStyle = gr; g.fillRect(0, 0, w, w);
+  }
+}, false);
 /* ---------- Materiais ---------- */
 const M = {
   lacquer: new THREE.MeshPhysicalMaterial({ color: 0xf4f4f2, roughness: .32, clearcoat: .35, clearcoatRoughness: .3 }),
   carcass: new THREE.MeshStandardMaterial({ color: 0xf1f1ef, roughness: .6 }),
   top: new THREE.MeshPhysicalMaterial({ map: rep(TX.quartz, 1.2, 1.2), roughness: .14, clearcoat: .6, clearcoatRoughness: .08 }),
-  floor: new THREE.MeshPhysicalMaterial({ map: rep(TX.marbleWhite, 4.6 / 1.8, 6.4 / 1.8), bumpMap: rep(groutBump, 4.6 / 1.8, 6.4 / 1.8), bumpScale: .002, roughness: .1, clearcoat: .8, clearcoatRoughness: .06 }),
-  wall: new THREE.MeshStandardMaterial({ color: 0xd9d7d3, roughness: .92 }),
-  ceiling: new THREE.MeshStandardMaterial({ color: 0xf6f6f6, roughness: .95 }),
+  floor: new THREE.MeshPhysicalMaterial({ map: rep(TX.marbleWhite, 4.6 / 1.8, 6.4 / 1.8), bumpMap: rep(groutBump, 4.6 / 1.8, 6.4 / 1.8), bumpScale: .002, roughness: .14, roughnessMap: rep(TX.polish, 1.5, 2), clearcoat: .8, clearcoatRoughness: .06 }),
+  wall: new THREE.MeshStandardMaterial({ color: 0xdcdad6, roughness: .92, map: rep(TX.paint, 3, 3), bumpMap: rep(TX.paint, 3, 3), bumpScale: .0012 }),
+  ceiling: new THREE.MeshStandardMaterial({ color: 0xf8f8f8, roughness: .95, map: rep(TX.paint, 4, 4) }),
   tile: new THREE.MeshPhysicalMaterial({ map: rep(TX.subway, 2.1 / 1.2, .7 / 1.2), bumpMap: rep(TX.subwayBump, 2.1 / 1.2, .7 / 1.2), bumpScale: .004, roughness: .08, clearcoat: 1, clearcoatRoughness: .05 }),
   steel: new THREE.MeshStandardMaterial({ color: 0xe4e6e8, metalness: 1, roughness: .26 }),
   steelDark: new THREE.MeshStandardMaterial({ color: 0x8d9093, metalness: 1, roughness: .35 }),
@@ -503,10 +516,10 @@ plane(M.shadow, 4.8, 1.0, 2.3, .0015, .32, 0, -Math.PI / 2).receiveShadow = fals
 
 // Spots embutidos
 const spots = [], fixtures = [];
-[[1.0, .9], [2.0, .9], [2.35, 2.9], [1.0, 3.0], [3.7, 1.0], [1.2, 5.0], [3.3, 5.0]].forEach(([x, z], i) => {
+[[1.0, .9], [2.0, .9], [2.35, 2.9], [1.25, 3.1], [3.7, 1.0], [1.3, 5.0], [3.3, 5.0]].forEach(([x, z], i) => {
   const ring0 = cyl(M.dark, .045, .045, .01, x, RH - .005, z, world, 24); ring0.castShadow = false;
   const d = cyl(M.downlight, .035, .035, .012, x, RH - .007, z, world, 24); d.castShadow = false; fixtures.push(ring0, d);
-  const s = new THREE.SpotLight(0xfff0dc, 0, 0, .8, .9, 2);
+  const s = new THREE.SpotLight(0xfff0dc, 0, 0, .62, .85, 2);
   s.position.set(x, RH - .03, z); s.target.position.set(x, 0, z);
   if (i < 3) { s.castShadow = true; s.shadow.mapSize.set(1024, 1024); s.shadow.bias = -.0004; s.shadow.radius = 4; }
   root.add(s, s.target); spots.push(s);
@@ -526,12 +539,61 @@ const spots = [], fixtures = [];
   plane(M.wall, 3, 2.7, RW + 1.5, 1.35, 0);
   B(M.lacquer, RW + 2.4, 0, .6, RW + 3, .9, 3.6, world, .01);
   B(M.top, RW + 2.38, .9, .58, RW + 3, .94, 3.62, world, .006);
-  const pot = cyl(M.ceramic, .16, .12, .4, RW + .6, .2, 5.6);
-  const leaf = new THREE.Mesh(new THREE.IcosahedronGeometry(.35, 1), M.green); leaf.position.set(RW + .6, .7, 5.6); leaf.castShadow = true; world.add(leaf);
-  // planta interna
-  cyl(M.ceramic, .17, .13, .45, .35, .225, 5.9);
-  const l2 = new THREE.Mesh(new THREE.IcosahedronGeometry(.32, 1), M.green); l2.position.set(.35, .8, 5.9); l2.scale.y = 1.4; l2.castShadow = true; world.add(l2);
 })();
+
+/* ---------- Detalhes de arquitetura ---------- */
+// Plantas com folhas modeladas (figueira-lira e ervas)
+const LEAF_MATS = [0x35602a, 0x3f6e30, 0x2f5524, 0x4a7a36].map(c => new THREE.MeshStandardMaterial({ color: c, roughness: .5, side: THREE.DoubleSide }));
+const POT = new THREE.MeshStandardMaterial({ color: 0x5b5752, roughness: .85 });
+const SOIL = new THREE.MeshStandardMaterial({ color: 0x3a2c22, roughness: 1 });
+const STEM = new THREE.MeshStandardMaterial({ color: 0x5d4a36, roughness: .9 });
+function leafGeo(L, W, curl) {
+  const sh = new THREE.Shape(); sh.moveTo(0, 0);
+  sh.bezierCurveTo(W * .9, L * .15, W * 1.1, L * .7, 0, L); sh.bezierCurveTo(-W * 1.1, L * .7, -W * .9, L * .15, 0, 0);
+  const g = new THREE.ShapeGeometry(sh, 10), p = g.attributes.position;
+  for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i); p.setZ(i, Math.pow(y / L, 2) * curl + Math.abs(x) * .45); }
+  g.computeVertexNormals(); return g;
+}
+function plant(x, z, y0, h, potR, potH, n, leafL, seed) {
+  const r = rng(seed), g = new THREE.Group(); g.position.set(x, y0, z); world.add(g);
+  const pot = new THREE.Mesh(new THREE.CylinderGeometry(potR, potR * .82, potH, 40), POT); pot.position.y = potH / 2; pot.castShadow = pot.receiveShadow = true; g.add(pot);
+  const soil = new THREE.Mesh(new THREE.CircleGeometry(potR * .94, 32), SOIL); soil.rotation.x = -Math.PI / 2; soil.position.y = potH - .02; g.add(soil);
+  const trunk = new THREE.Mesh(new THREE.CylinderGeometry(.012 * h, .02 * h, h * .85, 8), STEM); trunk.position.y = potH + h * .42; trunk.castShadow = true; g.add(trunk);
+  const Y = new THREE.Vector3(0, 1, 0);
+  for (let i = 0; i < n; i++) {
+    const t = .25 + .75 * (i / n), a = i * 2.4 + r() * .6, out = .35 + r() * .5;
+    const dir = new THREE.Vector3(Math.cos(a) * out, .55 + (1 - t) * .2 + r() * .3, Math.sin(a) * out).normalize();
+    const L = leafL * (.7 + r() * .5) * (1.1 - t * .3);
+    const m = new THREE.Mesh(leafGeo(L, L * .42, -L * (.25 + r() * .3)), LEAF_MATS[i % 4]);
+    m.position.set(Math.cos(a) * .02, potH + h * t, Math.sin(a) * .02);
+    m.quaternion.setFromUnitVectors(Y, dir); m.rotateY((r() - .5) * 1.2);
+    m.castShadow = true; g.add(m);
+  }
+  return g;
+}
+plant(.42, 5.92, 0, 1.25, .2, .42, 46, .26, 3);         // canto da cozinha
+plant(RW + .6, 5.6, 0, .95, .18, .38, 34, .24, 8);     // varanda
+plant(1.52, .3, .92, .22, .065, .12, 22, .07, 12);     // vaso de ervas na bancada
+
+// Tabica: frisos de sombra entre parede e teto de gesso
+const TABICA = new THREE.MeshStandardMaterial({ color: 0x5f5b57, roughness: .9 });
+B(TABICA, 0, RH - .018, 0, RW, RH, .012, world, 0, false);
+B(TABICA, 0, RH - .018, RD - .012, RW, RH, RD, world, 0, false);
+B(TABICA, 0, RH - .018, 0, .012, RH, RD, world, 0, false);
+B(TABICA, RW - .012, RH - .018, 0, RW, RH, RD, world, 0, false);
+
+// Porta de acesso na parede lateral
+const DOOR = new THREE.MeshStandardMaterial({ map: rep(TX.freijo, .6, 1.4), color: 0xe0b48a, roughness: .55 });
+B(M.white, 0, 0, 4.22, .05, 2.16, 4.29); B(M.white, 0, 0, 5.21, .05, 2.16, 5.28); B(M.white, 0, 2.1, 4.22, .05, 2.16, 5.28);
+B(DOOR, .004, 0, 4.29, .04, 2.1, 5.21, world, .004);
+B(M.steel, .04, .98, 5.02, .065, 1.0, 5.16, world, .006);
+B(M.steel, .04, .95, 5.12, .05, 1.03, 5.14, world, .004);
+
+// Tomadas no azulejo, tábua de corte e pano de prato
+[1.42, 2.62].forEach(x => { B(M.white, x - .04, 1.06, .002, x + .04, 1.14, .012, world, .003); B(M.dark, x - .012, 1.093, .012, x + .012, 1.107, .0135, world, 0, false); });
+const board = B(new THREE.MeshStandardMaterial({ map: rep(TX.freijo, .3, .4), color: 0xf0c49a, roughness: .6 }), 2.68, .92, .03, 2.98, 1.32, .05, world, .01);
+board.rotation.x = -.1; board.position.z += .02;
+B(new THREE.MeshStandardMaterial({ color: 0xd9d0c2, roughness: 1 }), 3.26, 1.02, .615, 3.44, 1.28, .628, world, .006);
 
 /* ---------- Realismo: oclusão de cantos ---------- */
 const aoGrad = (function () {
@@ -593,7 +655,7 @@ world.traverse(o => { if (o.material === M.shadow || o.material === M.shadowRoun
 /* ---------- Luzes ---------- */
 const hemi = new THREE.HemisphereLight(0xffffff, 0xd8d2cb, .2); root.add(hemi);
 const sun = new THREE.DirectionalLight(0xfff0dc, 3.2);
-sun.position.set(RW + 6, 5, 4.5); sun.target.position.set(2, 0, 2.2);
+sun.position.set(RW + 5, 9, 4.0); sun.target.position.set(2.5, 0, 2.2);
 sun.castShadow = true; sun.shadow.mapSize.set(SMALL ? 1024 : 2048, SMALL ? 1024 : 2048); sun.shadow.bias = -.0003; sun.shadow.normalBias = .02;
 Object.assign(sun.shadow.camera, { left: -5, right: 5, top: 5, bottom: -5, near: .5, far: 20 });
 root.add(sun, sun.target);
@@ -666,6 +728,7 @@ FIN.top.forEach(o => o.apply = () => { M.top.map = rep(o.tex(), 1.2, 1.2); M.top
 FIN.floor.forEach(o => o.apply = () => {
   M.floor.map = rep(o.tex(), o.rx, o.ry); M.floor.roughness = o.rough;
   M.floor.clearcoat = o.id === "marmore" ? .8 : o.id === "madeira" ? .3 : 0;
+  M.floor.roughnessMap = rep(TX.polish, 1.5, 2); M.floor.roughness = o.rough * 1.4;
   M.floor.bumpMap = o.id === "madeira" ? null : rep(groutBump, o.rx, o.ry);
   if (reflector) M.floor.opacity = FLOOR_OPACITY[o.id];
   M.floor.needsUpdate = true;
